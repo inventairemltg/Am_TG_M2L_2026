@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
 
 interface Shipment {
   id: string;
@@ -117,7 +118,6 @@ const ShipmentsPage: React.FC = () => {
     <div className="flex flex-col items-center text-gray-900 dark:text-gray-100">
       <div className="w-full max-w-4xl space-y-6">
         <div className="flex items-center justify-center mb-6">
-          {/* Removed back button, navigation is in Layout */}
           <h1 className="text-4xl font-bold text-center">Your Shipments</h1>
         </div>
 
@@ -152,7 +152,22 @@ const ShipmentsPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             {fetchingShipments ? (
-              <p className="text-center text-gray-600 dark:text-gray-400">Loading shipments...</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[...Array(4)].map((_, i) => ( // Show 4 skeleton cards
+                  <Card key={i} className="w-full bg-white dark:bg-gray-800 shadow-md">
+                    <CardHeader className="pb-2">
+                      <Skeleton className="h-6 w-3/4 mb-2" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             ) : shipments.length === 0 ? (
               <p className="text-center text-gray-600 dark:text-gray-400">No shipments found. Add one above!</p>
             ) : (
