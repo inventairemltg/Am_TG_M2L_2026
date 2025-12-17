@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MadeWithDyad } from './made-with-dyad';
+// Removed MadeWithDyad import here
 
 interface SessionContextType {
   session: Session | null;
@@ -55,7 +55,7 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <h1 className="text-2xl font-bold">Loading application...</h1>
-        <MadeWithDyad />
+        {/* MadeWithDyad removed from here, will be in Layout */}
       </div>
     );
   }

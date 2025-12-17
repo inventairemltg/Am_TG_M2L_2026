@@ -2,15 +2,12 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useSession } from "@/components/SessionContextProvider";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import ShipmentForm from "@/components/ShipmentForm";
 import ShipmentCard from "@/components/ShipmentCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { showSuccess, showError } from "@/utils/toast";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -30,14 +27,14 @@ interface Shipment {
 }
 
 const ShipmentsPage: React.FC = () => {
-  const { user, loading } = useSession();
+  const { user } = useSession(); // `loading` and `!user` checks are now handled by Layout
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [fetchingShipments, setFetchingShipments] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
 
   const fetchShipments = useCallback(async () => {
-    if (!user) return;
+    if (!user) return; // Should not happen if Layout is working
     setFetchingShipments(true);
 
     let query = supabase
@@ -114,38 +111,14 @@ const ShipmentsPage: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-        <h1 className="text-2xl font-bold">Loading user session...</h1>
-        <MadeWithDyad />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
-        <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-        <p className="text-lg">Please log in to view your shipments.</p>
-        <MadeWithDyad />
-      </div>
-    );
-  }
-
   const statusOptions = ["All", "Pending", "In Transit", "Delivered", "Cancelled"];
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
-      <div className="w-full max-w-4xl space-y-6 mt-8">
-        <div className="flex items-center justify-between mb-6">
-          <Button variant="outline" asChild>
-            <Link to="/dashboard">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
-            </Link>
-          </Button>
-          <h1 className="text-4xl font-bold text-center flex-grow">Your Shipments</h1>
-          <div className="w-[150px]"></div> {/* Spacer to balance the back button */}
+    <div className="flex flex-col items-center text-gray-900 dark:text-gray-100">
+      <div className="w-full max-w-4xl space-y-6">
+        <div className="flex items-center justify-center mb-6">
+          {/* Removed back button, navigation is in Layout */}
+          <h1 className="text-4xl font-bold text-center">Your Shipments</h1>
         </div>
 
         <ShipmentForm onShipmentAdded={fetchShipments} />
@@ -197,7 +170,6 @@ const ShipmentsPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

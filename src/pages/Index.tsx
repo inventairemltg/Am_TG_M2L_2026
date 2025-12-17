@@ -1,23 +1,12 @@
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useSession } from "@/components/SessionContextProvider";
 import { Button } from "@/components/ui/button";
-import { signOut } from "@/integrations/supabase/auth";
 import { Link } from "react-router-dom";
 
 const Index = () => {
-  const { user, loading } = useSession();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-        <h1 className="text-2xl font-bold">Loading user session...</h1>
-        <MadeWithDyad />
-      </div>
-    );
-  }
+  const { user } = useSession(); // `loading` check is now handled by Layout
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
+    <div className="flex flex-col items-center justify-center text-gray-900 dark:text-gray-100 p-4">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Welcome to Your Logistics App</h1>
         {user ? (
@@ -32,18 +21,16 @@ const Index = () => {
               <Button asChild variant="secondary">
                 <Link to="/shipments">View Shipments</Link>
               </Button>
-              <Button onClick={signOut} variant="outline">
-                Sign Out
-              </Button>
             </div>
           </>
         ) : (
+          // This block should ideally not be reached if Layout is working correctly
+          // as unauthenticated users are redirected to /login.
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
             Please log in to continue.
           </p>
         )}
       </div>
-      <MadeWithDyad />
     </div>
   );
 };
