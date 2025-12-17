@@ -10,7 +10,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { showSuccess, showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Shipment {
   id: string;
@@ -25,15 +33,29 @@ const ShipmentsPage: React.FC = () => {
   const { user, loading } = useSession();
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [fetchingShipments, setFetchingShipments] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
 
   const fetchShipments = useCallback(async () => {
     if (!user) return;
     setFetchingShipments(true);
-    const { data, error } = await supabase
+
+    let query = supabase
       .from("shipments")
       .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+      .eq("user_id", user.id);
+
+    if (filterStatus !== "All") {
+      query = query.eq("status", filterStatus);
+    }
+
+    if (searchTerm) {
+      query = query.or(
+        `origin.ilike.%${searchTerm}%,destination.ilike.%${searchTerm}%,tracking_number.ilike.%${searchTerm}%`
+      );
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching shipments:", error);
@@ -42,7 +64,7 @@ const ShipmentsPage: React.FC = () => {
       setShipments(data as Shipment[]);
     }
     setFetchingShipments(false);
-  }, [user]);
+  }, [user, filterStatus, searchTerm]);
 
   useEffect(() => {
     if (user) {
@@ -58,16 +80,16 @@ const ShipmentsPage: React.FC = () => {
 
     const { error } = await supabase
       .from("shipments")
-      .update({ status: newStatus, updated_at: new Date().toISOString() }) // Assuming an updated_at column exists or can be added
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
       .eq("id", id)
-      .eq("user_id", user.id); // Ensure only the owner can update
+      .eq("user_id", user.id);
 
     if (error) {
       console.error("Error updating shipment status:", error);
       showError("Failed to update shipment status.");
     } else {
       showSuccess("Shipment status updated successfully!");
-      fetchShipments(); // Refresh the list
+      fetchShipments();
     }
   };
 
@@ -81,14 +103,14 @@ const ShipmentsPage: React.FC = () => {
       .from("shipments")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id); // Ensure only the owner can delete
+      .eq("user_id", user.id);
 
     if (error) {
       console.error("Error deleting shipment:", error);
       showError("Failed to delete shipment.");
     } else {
       showSuccess("Shipment deleted successfully!");
-      fetchShipments(); // Refresh the list
+      fetchShipments();
     }
   };
 
@@ -111,6 +133,8 @@ const ShipmentsPage: React.FC = () => {
     );
   }
 
+  const statusOptions = ["All", "Pending", "In Transit", "Delivered", "Cancelled"];
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
       <div className="w-full max-w-4xl space-y-6 mt-8">
@@ -129,6 +153,29 @@ const ShipmentsPage: React.FC = () => {
         <Card className="bg-white dark:bg-gray-800 shadow-lg">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">All Shipments</CardTitle>
+            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input
+                  placeholder="Search by origin, destination, or tracking number..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <Select onValueChange={setFilterStatus} value={filterStatus}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statusOptions.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent>
             {fetchingShipments ? (
