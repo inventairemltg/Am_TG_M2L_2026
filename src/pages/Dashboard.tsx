@@ -5,6 +5,8 @@ import { useSession } from "@/components/SessionContextProvider";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import ProfileForm from "@/components/ProfileForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Dashboard: React.FC = () => {
   const { user, loading } = useSession();
@@ -29,8 +31,8 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-4">
+      <div className="w-full max-w-2xl space-y-6 mt-8">
         <Card className="bg-white dark:bg-gray-800 shadow-lg">
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-center">
@@ -39,9 +41,12 @@ const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="text-center">
-              <p className="text-lg text-gray-700 dark:text-gray-300">
-                Manage your profile information below.
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
+                Manage your profile information or view your shipments.
               </p>
+              <Button asChild className="mb-4">
+                <Link to="/shipments">Go to Shipments</Link>
+              </Button>
             </div>
             <ProfileForm />
           </CardContent>
