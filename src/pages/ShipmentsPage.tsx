@@ -7,7 +7,7 @@ import ShipmentForm from "@/components/ShipmentForm";
 import ShipmentCard from "@/components/ShipmentCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { showError } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -49,6 +49,48 @@ const ShipmentsPage: React.FC = () => {
       fetchShipments();
     }
   }, [user, fetchShipments]);
+
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    if (!user) {
+      showError("You must be logged in to update shipment status.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("shipments")
+      .update({ status: newStatus, updated_at: new Date().toISOString() }) // Assuming an updated_at column exists or can be added
+      .eq("id", id)
+      .eq("user_id", user.id); // Ensure only the owner can update
+
+    if (error) {
+      console.error("Error updating shipment status:", error);
+      showError("Failed to update shipment status.");
+    } else {
+      showSuccess("Shipment status updated successfully!");
+      fetchShipments(); // Refresh the list
+    }
+  };
+
+  const handleDeleteShipment = async (id: string) => {
+    if (!user) {
+      showError("You must be logged in to delete a shipment.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("shipments")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id); // Ensure only the owner can delete
+
+    if (error) {
+      console.error("Error deleting shipment:", error);
+      showError("Failed to delete shipment.");
+    } else {
+      showSuccess("Shipment deleted successfully!");
+      fetchShipments(); // Refresh the list
+    }
+  };
 
   if (loading) {
     return (
@@ -96,7 +138,12 @@ const ShipmentsPage: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {shipments.map((shipment) => (
-                  <ShipmentCard key={shipment.id} shipment={shipment} />
+                  <ShipmentCard
+                    key={shipment.id}
+                    shipment={shipment}
+                    onUpdateStatus={handleUpdateStatus}
+                    onDeleteShipment={handleDeleteShipment}
+                  />
                 ))}
               </div>
             )}
