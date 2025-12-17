@@ -2,6 +2,7 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useSession } from "@/components/SessionContextProvider";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/integrations/supabase/auth";
+import { Link } from "react-router-dom"; // Import Link
 
 const Index = () => {
   const { user, loading } = useSession();
@@ -24,9 +25,14 @@ const Index = () => {
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
               Hello, {user.email}! You are logged in.
             </p>
-            <Button onClick={signOut} className="mt-4">
-              Sign Out
-            </Button>
+            <div className="flex space-x-4 mt-4">
+              <Button asChild>
+                <Link to="/dashboard">Go to Dashboard</Link>
+              </Button>
+              <Button onClick={signOut} variant="outline">
+                Sign Out
+              </Button>
+            </div>
           </>
         ) : (
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
