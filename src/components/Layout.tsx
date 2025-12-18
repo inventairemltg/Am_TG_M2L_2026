@@ -1,17 +1,53 @@
 "use client";
 
-import React from "react";
-import { Link, Outlet } from "react-router-dom"; // Import Outlet
+import React, { useEffect, useState } from "react";
+import { Link, Outlet } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/integrations/supabase/auth";
 import { useSession } from "./SessionContextProvider";
-import { Package2, LogOut, LayoutDashboard, Truck } from "lucide-react";
+import { Package2, LogOut, LayoutDashboard, Truck, User as UserIcon } from "lucide-react";
 import { MadeWithDyad } from "./made-with-dyad";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
 
-// Removed LayoutProps interface as Outlet handles content
-
-const Layout: React.FC = () => { // Removed LayoutProps from here
+const Layout: React.FC = () => {
   const { user, loading } = useSession();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching avatar:", error);
+        } else if (data) {
+          setAvatarUrl(data.avatar_url);
+        }
+      } else {
+        setAvatarUrl(null); // Clear avatar if user logs out
+      }
+    };
+    fetchAvatar();
+
+    // Listen for profile changes (e.g., avatar updates)
+    const channel = supabase
+      .channel('public:profiles')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user?.id}` }, (payload) => {
+        if (payload.new.avatar_url !== undefined) {
+          setAvatarUrl(payload.new.avatar_url as string | null);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user]);
 
   if (loading) {
     return (
@@ -23,9 +59,7 @@ const Layout: React.FC = () => { // Removed LayoutProps from here
   }
 
   if (!user) {
-    // If not logged in, render Outlet directly (e.g., Login page)
-    // SessionContextProvider will handle redirection to /login
-    return <Outlet />; // Render Outlet here for unauthenticated routes if needed, though SessionContextProvider redirects
+    return <Outlet />;
   }
 
   return (
@@ -51,9 +85,17 @@ const Layout: React.FC = () => { // Removed LayoutProps from here
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-              {user.email}
-            </span>
+            {user.email && (
+              <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
+                {user.email}
+              </span>
+            )}
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={avatarUrl || undefined} alt="User Avatar" />
+              <AvatarFallback>
+                <UserIcon className="h-5 w-5 text-gray-500" />
+              </AvatarFallback>
+            </Avatar>
             <Button onClick={signOut} variant="outline" size="sm">
               <LogOut className="mr-2 h-4 w-4" /> Sign Out
             </Button>
@@ -61,7 +103,7 @@ const Layout: React.FC = () => { // Removed LayoutProps from here
         </div>
       </header>
       <main className="flex-grow container mx-auto py-8 px-4">
-        <Outlet /> {/* Render Outlet here to display nested routes */}
+        <Outlet />
       </main>
       <MadeWithDyad />
     </div>

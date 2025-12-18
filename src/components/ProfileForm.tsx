@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { showSuccess, showError } from "@/utils/toast";
+import AvatarUpload from "./AvatarUpload"; // Import AvatarUpload
 
 const profileFormSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -20,6 +21,8 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 const ProfileForm: React.FC = () => {
   const { user } = useSession();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -33,7 +36,7 @@ const ProfileForm: React.FC = () => {
       if (user) {
         const { data, error } = await supabase
           .from("profiles")
-          .select("first_name, last_name")
+          .select("first_name, last_name, avatar_url") // Select avatar_url
           .eq("id", user.id)
           .single();
 
@@ -45,6 +48,7 @@ const ProfileForm: React.FC = () => {
             first_name: data.first_name || "",
             last_name: data.last_name || "",
           });
+          setAvatarUrl(data.avatar_url); // Set avatar URL
         }
       }
     };
@@ -74,8 +78,13 @@ const ProfileForm: React.FC = () => {
     }
   };
 
+  const handleAvatarChange = (newUrl: string | null) => {
+    setAvatarUrl(newUrl);
+  };
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <AvatarUpload currentAvatarUrl={avatarUrl} onAvatarChange={handleAvatarChange} />
       <div>
         <Label htmlFor="first_name">First Name</Label>
         <Input
