@@ -25,6 +25,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const shipmentSchema = z.object({
   origin: z.string().min(1, "Origin is required"),
@@ -118,6 +125,27 @@ const ShipmentDetailsPage: React.FC = () => {
     }
   };
 
+  const handleStatusChange = async (newStatus: string) => {
+    if (!user || !id) {
+      showError("You must be logged in to update shipment status.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("shipments")
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("Error updating shipment status:", error);
+      showError("Failed to update shipment status.");
+    } else {
+      showSuccess("Shipment status updated successfully!");
+      setShipment((prev) => prev ? { ...prev, status: newStatus } : null);
+    }
+  };
+
   const handleDeleteShipment = async () => {
     if (!user || !id) {
       showError("You must be logged in to delete a shipment.");
@@ -138,6 +166,8 @@ const ShipmentDetailsPage: React.FC = () => {
       navigate("/shipments"); // Redirect to shipments list after deletion
     }
   };
+
+  const statusOptions = ["Pending", "In Transit", "Delivered", "Cancelled"];
 
   if (loading) {
     return (
@@ -200,8 +230,20 @@ const ShipmentDetailsPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg">
-              <div>
-                <strong>Status:</strong> <span className="font-medium">{shipment.status}</span>
+              <div className="flex items-center justify-between">
+                <strong>Status:</strong>
+                <Select onValueChange={handleStatusChange} value={shipment.status}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statusOptions.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <strong>Created At:</strong> {new Date(shipment.created_at).toLocaleDateString()}
