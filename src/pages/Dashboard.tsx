@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useSession } from "@/components/SessionContextProvider";
-import ProfileForm from "@/components/ProfileForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -26,10 +25,12 @@ const Dashboard: React.FC = () => {
           <CardContent className="space-y-6">
             <div className="text-center">
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
-                Manage your profile information or view your shipments.
+                View your shipment statistics or manage your profile.
               </p>
+              <Button asChild>
+                <Link to="/profile">Manage Profile</Link>
+              </Button>
             </div>
-            <ProfileForm />
           </CardContent>
         </Card>
 

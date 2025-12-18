@@ -82,6 +82,11 @@ const Layout: React.FC = () => {
                   <Truck className="mr-2 h-4 w-4" /> Shipments
                 </Link>
               </Button>
+              <Button variant="ghost" asChild>
+                <Link to="/profile" className="flex items-center"> {/* New Profile link */}
+                  <UserIcon className="mr-2 h-4 w-4" /> Profile
+                </Link>
+              </Button>
             </nav>
           </div>
           <div className="flex items-center space-x-4">

@@ -8,7 +8,8 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ShipmentsPage from "./pages/ShipmentsPage";
-import ShipmentDetailsPage from "./pages/ShipmentDetailsPage"; // Import the new page
+import ShipmentDetailsPage from "./pages/ShipmentDetailsPage";
+import ProfilePage from "./pages/ProfilePage"; // Import the new ProfilePage
 import { SessionContextProvider } from "./components/SessionContextProvider";
 import Layout from "./components/Layout";
 
@@ -27,7 +28,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/shipments" element={<ShipmentsPage />} />
-              <Route path="/shipments/:id" element={<ShipmentDetailsPage />} /> {/* New route */}
+              <Route path="/shipments/:id" element={<ShipmentDetailsPage />} />
+              <Route path="/profile" element={<ProfilePage />} /> {/* New route for ProfilePage */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
