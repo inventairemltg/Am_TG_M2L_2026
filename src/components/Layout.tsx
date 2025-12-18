@@ -8,46 +8,13 @@ import { useSession } from "./SessionContextProvider";
 import { Package2, LogOut, LayoutDashboard, Truck, User as UserIcon } from "lucide-react";
 import { MadeWithDyad } from "./made-with-dyad";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client"; // Keep for potential future direct supabase interactions if needed, but not for avatar here.
 
 const Layout: React.FC = () => {
-  const { user, loading } = useSession();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { user, profile, loading } = useSession(); // Get profile from session context
 
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      if (user) {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("avatar_url")
-          .eq("id", user.id)
-          .single();
-
-        if (error) {
-          console.error("Error fetching avatar:", error);
-        } else if (data) {
-          setAvatarUrl(data.avatar_url);
-        }
-      } else {
-        setAvatarUrl(null); // Clear avatar if user logs out
-      }
-    };
-    fetchAvatar();
-
-    // Listen for profile changes (e.g., avatar updates)
-    const channel = supabase
-      .channel('public:profiles')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user?.id}` }, (payload) => {
-        if (payload.new.avatar_url !== undefined) {
-          setAvatarUrl(payload.new.avatar_url as string | null);
-        }
-      })
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [user]);
+  // The avatarUrl state and useEffect are no longer needed here as profile.avatar_url is directly available
+  // and managed by SessionContextProvider.
 
   if (loading) {
     return (
@@ -61,6 +28,10 @@ const Layout: React.FC = () => {
   if (!user) {
     return <Outlet />;
   }
+
+  const displayName = profile?.first_name && profile?.last_name
+    ? `${profile.first_name} ${profile.last_name}`
+    : user.email;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
@@ -83,20 +54,20 @@ const Layout: React.FC = () => {
                 </Link>
               </Button>
               <Button variant="ghost" asChild>
-                <Link to="/profile" className="flex items-center"> {/* New Profile link */}
+                <Link to="/profile" className="flex items-center">
                   <UserIcon className="mr-2 h-4 w-4" /> Profile
                 </Link>
               </Button>
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            {user.email && (
+            {displayName && (
               <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-                {user.email}
+                {displayName}
               </span>
             )}
             <Avatar className="h-8 w-8">
-              <AvatarImage src={avatarUrl || undefined} alt="User Avatar" />
+              <AvatarImage src={profile?.avatar_url || undefined} alt="User Avatar" />
               <AvatarFallback>
                 <UserIcon className="h-5 w-5 text-gray-500" />
               </AvatarFallback>
