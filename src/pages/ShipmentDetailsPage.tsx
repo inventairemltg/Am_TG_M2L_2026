@@ -13,6 +13,18 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 const shipmentSchema = z.object({
   origin: z.string().min(1, "Origin is required"),
@@ -106,6 +118,27 @@ const ShipmentDetailsPage: React.FC = () => {
     }
   };
 
+  const handleDeleteShipment = async () => {
+    if (!user || !id) {
+      showError("You must be logged in to delete a shipment.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("shipments")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("Error deleting shipment:", error);
+      showError("Failed to delete shipment.");
+    } else {
+      showSuccess("Shipment deleted successfully!");
+      navigate("/shipments"); // Redirect to shipments list after deletion
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center text-gray-900 dark:text-gray-100">
@@ -138,10 +171,32 @@ const ShipmentDetailsPage: React.FC = () => {
     <div className="flex flex-col items-center text-gray-900 dark:text-gray-100">
       <div className="w-full max-w-2xl space-y-6">
         <Card className="bg-white dark:bg-gray-800 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold text-center">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-3xl font-bold">
               Shipment Details (ID: {shipment.id.substring(0, 8)}...)
             </CardTitle>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="flex items-center">
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete this shipment
+                    and remove its data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteShipment} className="bg-red-600 text-white hover:bg-red-700">
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg">
