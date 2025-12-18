@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Index = () => {
-  const { user } = useSession(); // `loading` check is now handled by Layout
+  const { user, profile } = useSession(); // Get profile from session context
+
+  const displayName = profile?.first_name && profile?.last_name
+    ? `${profile.first_name} ${profile.last_name}`
+    : user?.email; // Use optional chaining for user.email
 
   return (
     <div className="flex flex-col items-center justify-center text-gray-900 dark:text-gray-100 p-4">
@@ -12,7 +16,7 @@ const Index = () => {
         {user ? (
           <>
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
-              Hello, {user.email}! You are logged in.
+              Hello, {displayName}! You are logged in.
             </p>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-4">
               <Button asChild>
