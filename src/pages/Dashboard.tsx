@@ -5,13 +5,11 @@ import { useSession } from "@/components/SessionContextProvider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import ShipmentStatistics from "@/components/ShipmentStatistics"; // Import ShipmentStatistics
+import ShipmentStatistics from "@/components/ShipmentStatistics";
+import RecentShipments from "@/components/RecentShipments"; // Import RecentShipments
 
 const Dashboard: React.FC = () => {
-  const { user } = useSession(); // `loading` check is now handled by Layout
-
-  // No need for !user check here, as Layout handles redirection for unauthenticated users.
-  // If we reach here, user is guaranteed to be logged in.
+  const { user } = useSession();
 
   return (
     <div className="flex flex-col items-center text-gray-900 dark:text-gray-100">
@@ -34,8 +32,8 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Add ShipmentStatistics component */}
         <ShipmentStatistics />
+        <RecentShipments /> {/* Add RecentShipments component here */}
       </div>
     </div>
   );
