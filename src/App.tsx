@@ -8,8 +8,9 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ShipmentsPage from "./pages/ShipmentsPage";
+import ShipmentDetailsPage from "./pages/ShipmentDetailsPage"; // Import the new page
 import { SessionContextProvider } from "./components/SessionContextProvider";
-import Layout from "./components/Layout"; // Import the new Layout component
+import Layout from "./components/Layout";
 
 const queryClient = new QueryClient();
 
@@ -22,11 +23,11 @@ const App = () => (
         <SessionContextProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
-            {/* Wrap authenticated routes with the Layout component */}
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/shipments" element={<ShipmentsPage />} />
+              <Route path="/shipments/:id" element={<ShipmentDetailsPage />} /> {/* New route */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

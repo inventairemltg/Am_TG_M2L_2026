@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Package, MapPin, Truck, Hash, MoreHorizontal, Trash2 } from "lucide-react";
+import { Package, MapPin, Truck, Hash, MoreHorizontal, Trash2, Eye } from "lucide-react"; // Import Eye icon
 import {
   Select,
   SelectContent,
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Link } from "react-router-dom"; // Import Link
 
 interface ShipmentCardProps {
   shipment: {
@@ -68,9 +69,14 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({ shipment, onUpdateStatus, o
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link to={`/shipments/${shipment.id}`} className="flex items-center cursor-pointer">
+                <Eye className="mr-2 h-4 w-4" /> View Details
+              </Link>
+            </DropdownMenuItem>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600 focus:text-red-600">
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600 focus:text-red-600 cursor-pointer">
                   <Trash2 className="mr-2 h-4 w-4" /> Delete
                 </DropdownMenuItem>
               </AlertDialogTrigger>
