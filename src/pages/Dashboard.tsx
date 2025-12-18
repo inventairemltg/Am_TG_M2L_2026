@@ -6,6 +6,7 @@ import ProfileForm from "@/components/ProfileForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import ShipmentStatistics from "@/components/ShipmentStatistics"; // Import ShipmentStatistics
 
 const Dashboard: React.FC = () => {
   const { user } = useSession(); // `loading` check is now handled by Layout
@@ -27,11 +28,13 @@ const Dashboard: React.FC = () => {
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
                 Manage your profile information or view your shipments.
               </p>
-              {/* Removed redundant button, navigation is in Layout */}
             </div>
             <ProfileForm />
           </CardContent>
         </Card>
+
+        {/* Add ShipmentStatistics component */}
+        <ShipmentStatistics />
       </div>
     </div>
   );
