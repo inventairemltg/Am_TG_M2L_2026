@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowLeft } from "lucide-react"; // Import ArrowLeft icon
 import {
   Select,
   SelectContent,
@@ -200,6 +200,11 @@ const ShipmentDetailsPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center text-gray-900 dark:text-gray-100">
       <div className="w-full max-w-2xl space-y-6">
+        <div className="flex justify-start mb-4">
+          <Button variant="outline" onClick={() => navigate("/shipments")} className="flex items-center">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Shipments
+          </Button>
+        </div>
         <Card className="bg-white dark:bg-gray-800 shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-3xl font-bold">
