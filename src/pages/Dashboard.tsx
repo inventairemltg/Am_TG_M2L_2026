@@ -6,14 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ShipmentStatistics from "@/components/ShipmentStatistics";
-import RecentShipments from "@/components/RecentShipments"; // Import RecentShipments
+import RecentShipments from "@/components/RecentShipments";
+import ShipmentSummaryCards from "@/components/ShipmentSummaryCards"; // Import ShipmentSummaryCards
 
 const Dashboard: React.FC = () => {
   const { user } = useSession();
 
   return (
     <div className="flex flex-col items-center text-gray-900 dark:text-gray-100">
-      <div className="w-full max-w-2xl space-y-6">
+      <div className="w-full max-w-4xl space-y-6"> {/* Increased max-w to accommodate more cards */}
         <Card className="bg-white dark:bg-gray-800 shadow-lg">
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-center">
@@ -32,8 +33,9 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
+        <ShipmentSummaryCards /> {/* Add ShipmentSummaryCards component here */}
         <ShipmentStatistics />
-        <RecentShipments /> {/* Add RecentShipments component here */}
+        <RecentShipments />
       </div>
     </div>
   );
