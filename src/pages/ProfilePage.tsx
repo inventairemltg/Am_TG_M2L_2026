@@ -2,6 +2,7 @@
 
 import React from "react";
 import ProfileForm from "@/components/ProfileForm";
+import UpdatePasswordForm from "@/components/UpdatePasswordForm"; // Import the new component
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "@/components/SessionContextProvider";
 
@@ -26,6 +27,9 @@ const ProfilePage: React.FC = () => {
             <ProfileForm />
           </CardContent>
         </Card>
+
+        {/* Add the UpdatePasswordForm component */}
+        <UpdatePasswordForm />
       </div>
     </div>
   );
