@@ -7,7 +7,7 @@ import ShipmentCard from "@/components/ShipmentCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { showSuccess, showError } from "@/utils/toast";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react"; // Import Download icon
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -26,6 +26,8 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button"; // Import Button
+import { exportToCsv } from "@/utils/csvExport"; // Import exportToCsv
 
 interface Shipment {
   id: string;
@@ -46,6 +48,7 @@ const ShipmentsPage: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalShipmentCount, setTotalShipmentCount] = useState(0);
+  const [exporting, setExporting] = useState(false);
 
   const fetchShipments = useCallback(async () => {
     if (!user) return;
@@ -130,6 +133,36 @@ const ShipmentsPage: React.FC = () => {
     } else {
       showSuccess("Shipment deleted successfully!");
       fetchShipments(); // Re-fetch to update the list
+    }
+  };
+
+  const handleExportCsv = async () => {
+    if (!user) {
+      showError("You must be logged in to export shipments.");
+      return;
+    }
+    setExporting(true);
+    try {
+      const { data, error } = await supabase
+        .from("shipments")
+        .select("*")
+        .eq("user_id", user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      if (data && data.length > 0) {
+        exportToCsv("shipments.csv", data);
+        showSuccess("Shipments exported successfully!");
+      } else {
+        showError("No shipments found to export.");
+      }
+    } catch (error: any) {
+      console.error("Error exporting shipments:", error.message);
+      showError("Failed to export shipments: " + error.message);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -225,7 +258,13 @@ const ShipmentsPage: React.FC = () => {
 
         <Card className="bg-white dark:bg-gray-800 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">All Shipments</CardTitle>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+              <CardTitle className="text-2xl font-bold mb-2 sm:mb-0">All Shipments</CardTitle>
+              <Button onClick={handleExportCsv} disabled={exporting} className="flex items-center">
+                <Download className="mr-2 h-4 w-4" />
+                {exporting ? "Exporting..." : "Export to CSV"}
+              </Button>
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 mt-4">
               <div className="relative flex-grow">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
