@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Package, MapPin, Truck, Hash, MoreHorizontal, Trash2, Eye } from "lucide-react"; // Import Eye icon
+import { Package, MapPin, Truck, Hash, MoreHorizontal, Trash2, Eye } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
 
 interface ShipmentCardProps {
   shipment: {
@@ -50,8 +50,9 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({ shipment, onUpdateStatus, o
   const statusOptions = ["Pending", "In Transit", "Delivered", "Cancelled"];
 
   return (
-    <Card className="w-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow duration-200">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+    <Card className="w-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow duration-200 relative">
+      <Link to={`/shipments/${shipment.id}`} className="absolute inset-0 z-0" aria-label={`View details for shipment ${shipment.id.substring(0, 8)}`}></Link>
+      <CardHeader className="pb-2 flex flex-row items-center justify-between relative z-10">
         <div>
           <CardTitle className="flex items-center text-xl font-bold text-gray-900 dark:text-gray-100">
             <Package className="mr-2 h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -63,12 +64,12 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({ shipment, onUpdateStatus, o
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
             <DropdownMenuItem asChild>
               <Link to={`/shipments/${shipment.id}`} className="flex items-center cursor-pointer">
                 <Eye className="mr-2 h-4 w-4" /> View Details
@@ -99,7 +100,7 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({ shipment, onUpdateStatus, o
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
-      <CardContent className="space-y-2 text-gray-700 dark:text-gray-300">
+      <CardContent className="space-y-2 text-gray-700 dark:text-gray-300 relative z-10">
         <div className="flex items-center">
           <MapPin className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
           <strong>Origin:</strong> {shipment.origin}
@@ -114,10 +115,10 @@ const ShipmentCard: React.FC<ShipmentCardProps> = ({ shipment, onUpdateStatus, o
             <strong>Status:</strong>
           </div>
           <Select onValueChange={handleStatusChange} value={shipment.status}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[180px]" onClick={(e) => e.stopPropagation()}>
               <SelectValue placeholder="Select Status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent onClick={(e) => e.stopPropagation()}>
               {statusOptions.map((status) => (
                 <SelectItem key={status} value={status}>
                   {status}
